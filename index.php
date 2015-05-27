@@ -1,18 +1,20 @@
 <?php
-
 /**
- * Copyright (c) 2014 Filip Sedláček (filsedla@gmail.com)
+ * Copyright (c) 2015 Filip Sedlacek <filsedla@gmail.com>
  */
 
-use Filsedla\DbTool\DbTool;
+namespace Filsedla\DbTool;
+
+use Nette\Database\Context;
 use Tracy\Debugger;
 
-require __DIR__ . '/bootstrap.php'; // $container
+/** @var \SystemContainer $container */
+$container = require __DIR__ . '/bootstrap.php';
+
+/** @var Context $database */
+$dbTool = $container->getByType('Filsedla\DbTool\DbTool');
 
 Debugger::$maxDepth = 10;
 Debugger::$maxLen = 1000;
 
-$rootDir = __DIR__;
-$dbTool = new DbTool($rootDir, $container);
 $dbTool->process();
-

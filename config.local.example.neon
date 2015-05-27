@@ -1,0 +1,13 @@
+parameters:
+
+    dumpDir: %appDir%/db_dump
+
+    database:
+        host: localhost
+        dbname: test
+        user: root
+        password: ***
+
+
+
+

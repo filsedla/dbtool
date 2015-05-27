@@ -1,0 +1,20 @@
+parameters:
+    container:
+        class: SystemContainer
+
+php:
+    date.timezone: Europe/Prague
+
+database:
+    dsn: 'mysql:host=%database.host%;dbname=%database.dbname%'
+    user: %database.user%
+    password: %database.password%
+    debugger: TRUE
+    explain: FALSE
+    options:
+        lazy: TRUE
+
+services:
+    - Filsedla\DbTool\DbTool(..., %dumpDir%)
+
+

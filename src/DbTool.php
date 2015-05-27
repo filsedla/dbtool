@@ -6,34 +6,28 @@
 
 namespace Filsedla\DbTool;
 
-use Nette\DI\Container;
+use Nette\Database\Context;
 use Nette\Utils\Strings;
 
 final class DbTool
 {
-    const DUMP_DIR = '/../db_dev';
-
-    /** @var \Nette\DI\Container */
-    private $container;
-
-    /** @var \Nette\Database\Context */
+    /** @var Context */
     private $db;
 
     /** @var string */
     private $databaseName;
 
     /** @var string */
-    private $dumpDirectory;
+    private $dumpDir;
 
     /**
-     * @param string $rootDir
-     * @param Container $container
+     * @param Context $context
+     * @param string $dumpDir
      */
-    function __construct($rootDir, Container $container)
+    function __construct(Context $context, $dumpDir)
     {
-        $this->container = $container;
-        $this->db = $this->container->getByType('Nette\Database\Context');
-        $this->dumpDirectory = $rootDir . self::DUMP_DIR;
+        $this->db = $context;
+        $this->dumpDir = $dumpDir;
         $this->fetchDatabaseName();
     }
 
@@ -82,7 +76,7 @@ final class DbTool
                 $createProcedure . "\n" . "\n" .
                 "DELIMITER ;" . Data::footer();
 
-            $dump = new Dump($name, Dump::TYPE_PROCEDURE, $this->dumpDirectory);
+            $dump = new Dump($name, Dump::TYPE_PROCEDURE, $this->dumpDir);
             $dump->saveIfChanged($data,
                 function ($fromFile) use ($createProcedure) {
                     $createProcedureFromFile = Strings::match($fromFile, "/CREATE.*END;;/s")[0];
@@ -112,7 +106,7 @@ final class DbTool
                 $createTrigger . "\n" . "\n" .
                 "DELIMITER ;" . Data::footer();
 
-            $dump = new Dump($name, Dump::TYPE_TRIGGER, $this->dumpDirectory);
+            $dump = new Dump($name, Dump::TYPE_TRIGGER, $this->dumpDir);
             $dump->saveIfChanged($data,
                 function ($fromFile) use ($createTrigger) {
                     $createTriggerFromFile = Strings::match($fromFile, "/CREATE.*END;;/s")[0];
@@ -145,7 +139,7 @@ final class DbTool
 
                 $data = Data::header() . $dropTable . $createTable . "\n" . Data::footer();
 
-                $dump = new Dump($tableName, Dump::TYPE_TABLE, $this->dumpDirectory);
+                $dump = new Dump($tableName, Dump::TYPE_TABLE, $this->dumpDir);
                 $dump->saveIfChanged($data,
                     function ($fromFile) use ($createTable) {
                         $createTableFromFile = Strings::match($fromFile, "/CREATE.*;/s")[0];
