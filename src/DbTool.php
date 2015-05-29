@@ -73,7 +73,12 @@ final class DbTool
 
             $row = $this->db->query("SHOW CREATE PROCEDURE `$name`")->fetch();
 
-            $createProcedure = $row['Create Procedure'] . ";;";
+            $createProcedure = $row['Create Procedure'];
+            if ($createProcedure === NULL) {
+                echo "<span style=\"color: red\">Unavailable: <strong>$name</strong></span><br>\n";
+                continue;
+            }
+            $createProcedure = $createProcedure . ";;";
             $createProcedure = Strings::replace($createProcedure, '/DEFINER=`.+?`\@`.+?`\s?/');
 
             $dropProcedure = "DROP PROCEDURE IF EXISTS `$name`;;";
@@ -107,7 +112,12 @@ final class DbTool
 
             $row = $this->db->query("SHOW CREATE FUNCTION `$name`")->fetch();
 
-            $createFunction = $row['Create Function'] . ";;";
+            $createFunction = $row['Create Function'];
+            if ($createFunction === NULL) {
+                echo "<span style=\"color: red\">Unavailable: <strong>$name</strong></span><br>\n";
+                continue;
+            }
+            $createFunction = $createFunction . ";;";
             $createFunction = Strings::replace($createFunction, '/DEFINER=`.+?`\@`.+?`\s?/');
 
             $dropFunction = "DROP FUNCTION IF EXISTS `$name`;;";
