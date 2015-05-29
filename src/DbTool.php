@@ -52,6 +52,9 @@ final class DbTool
         echo "-------------- <em>Processing procedures</em> --------------<br>\n";
         $this->processProcedures();
 
+        echo "-------------- <em>Processing functions</em> --------------<br>\n";
+        $this->processFunctions();
+
         echo '<br><em>OK</em><br>';
     }
 
@@ -84,6 +87,40 @@ final class DbTool
                 function ($fromFile) use ($createProcedure) {
                     $createProcedureFromFile = Strings::match($fromFile, "/CREATE.*END;;/s")[0];
                     return Strings::normalize($createProcedureFromFile) == Strings::normalize($createProcedure);
+                }
+            );
+        }
+    }
+
+    private function processFunctions()
+    {
+        $listResult = $this->db->query('SHOW FUNCTION STATUS')->fetchAll();
+
+        foreach ($listResult as $listRow) {
+
+            $dbName = $listRow['Db'];
+            if ($dbName != $this->databaseName) {
+                continue;
+            }
+
+            $name = $listRow['Name'];
+
+            $row = $this->db->query("SHOW CREATE FUNCTION `$name`")->fetch();
+
+            $createFunction = $row['Create Function'] . ";;";
+            $createFunction = Strings::replace($createFunction, '/DEFINER=`.+?`\@`.+?`\s?/');
+
+            $dropFunction = "DROP FUNCTION IF EXISTS `$name`;;";
+
+            $data = Data::header() . "DELIMITER ;;" . "\n" . "\n" . $dropFunction . "\n" .
+                $createFunction . "\n" . "\n" .
+                "DELIMITER ;" . Data::footer();
+
+            $dump = new Dump($name, Dump::TYPE_FUNCTION, $this->dumpDir);
+            $dump->saveIfChanged($data,
+                function ($fromFile) use ($createFunction) {
+                    $createFunctionFromFile = Strings::match($fromFile, "/CREATE.*END;;/s")[0];
+                    return Strings::normalize($createFunctionFromFile) == Strings::normalize($createFunction);
                 }
             );
         }
