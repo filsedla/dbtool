@@ -15,6 +15,6 @@ $container = require __DIR__ . '/bootstrap.php';
 $dbTool = $container->getByType('Filsedla\DbTool\DbTool');
 
 Debugger::$maxDepth = 10;
-Debugger::$maxLen = 1000;
+Debugger::$maxLen = 5000;
 
 $dbTool->process();

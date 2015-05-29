@@ -43,6 +43,9 @@ final class DbTool
         echo "-------------- <em>Processing tables</em> --------------<br>\n";
         $this->processTables();
 
+        echo "-------------- <em>Processing views</em> --------------<br>\n";
+        $this->processViews();
+
         echo "-------------- <em>Processing triggers</em> --------------<br>\n";
         $this->processTriggers();
 
@@ -144,6 +147,115 @@ final class DbTool
                     function ($fromFile) use ($createTable) {
                         $createTableFromFile = Strings::match($fromFile, "/CREATE.*;/s")[0];
                         return Strings::normalize($createTableFromFile) == Strings::normalize($createTable);
+                    }
+                );
+            }
+        }
+
+    }
+
+    private function processViews()
+    {
+        $tables = $this->db->getConnection()->getSupplementalDriver()->getTables();
+
+        foreach ($tables as $table) {
+            if ($table['view'] == TRUE) {
+
+                $viewName = $table['name'];
+
+                // Fetch SHOW CREATE VIEW string
+                $row = $this->db->query("SHOW CREATE VIEW `$viewName`")->fetch();
+                $createView = $row["Create View"];
+
+                // Remove Auto increment value
+                $createView = Strings::replace($createView, '#SQL SECURITY DEFINER\s?#i');
+                $createView = Strings::replace($createView, '#ALGORITHM=UNDEFINED\s?#i');
+                $createView = Strings::replace($createView, '/DEFINER=`.+?`\@`.+?`\s?/');
+
+                $result = Strings::split($createView, '#\s|(,)|(\()|(\))#i', PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+//                dump($result);
+//                exit;
+
+                $formatted = [];
+                $depth = 0;
+                $lastToken = NULL;
+                foreach ($result as $token) {
+
+                    if (in_array(strtolower($token), ['select', 'where', 'group', 'from', 'left', 'join', 'right', 'inner'])
+                        && !in_array($lastToken, ['left', 'right', 'inner'])
+                    ) {
+                        $formatted[] = "\n";
+                    }
+
+                    if (in_array(strtolower($token), ['left', 'join', 'right', 'inner'])
+                        && !in_array($lastToken, ['left', 'right', 'inner'])
+                    ) {
+                        $formatted[] = "  ";
+                    }
+
+                    if (in_array(strtolower($token), [
+                        'select', 'group', 'order', 'from', 'by', 'between', 'and', 'or',
+                        'left', 'join', 'right', 'inner', 'when', 'else', 'case', 'if', 'end',
+                        'count', 'sum', 'distinct', 'on', 'ifnull', 'nullif', 'concat_ws', 'concat',
+                        'coalesce', 'null', 'then', 'is', 'not', 'isnull', 'where', 'locate', 'find_in_set',
+                        'group_concat'
+                    ])
+                    ) {
+                        $formatted[] = strtoupper($token);
+
+                    } else {
+                        $formatted[] = $token;
+                    }
+
+                    $depth += substr_count($token, '(');
+                    $depth -= substr_count($token, ')');
+
+                    if (strtolower($token) == 'select') {
+                        $formatted[] = "\n  ";
+                    }
+
+                    if ($depth == 0 && $token == ',') {
+                        $formatted[] = "\n  ";
+
+                    } elseif ($token == ',') {
+                        $formatted[] = ' ';
+                    }
+                    $lastToken = $token;
+                }
+
+                $output = "";
+                $lastToken = NULL;
+                foreach ($formatted as $token) {
+
+                    if (in_array($token, [',', ')'])
+                        || ($lastToken && in_array($lastToken, [' ', ',', '(', "\n"])
+                            || !$lastToken)
+                    ) {
+                        $output = $output . $token;
+
+                    } else {
+                        $output = $output . ' ' . $token;
+                    }
+                    $lastToken = $token;
+                }
+
+//                echo '<pre>' . $output . '</pre>';
+//                echo Helpers::dumpSql($output);
+                $createView = $output;
+
+                // Add ;
+                $createView .= ";";
+
+                $dropTable = "DROP VIEW IF EXISTS `$viewName`;\n";
+
+                $data = Data::header() . $dropTable . $createView . "\n" . Data::footer();
+
+                $dump = new Dump($viewName, Dump::TYPE_VIEW, $this->dumpDir);
+                $dump->saveIfChanged($data,
+                    function ($fromFile) use ($createView) {
+                        $createViewFromFile = Strings::match($fromFile, "/CREATE.*;/s")[0];
+                        return Strings::normalize($createViewFromFile) == Strings::normalize($createView);
                     }
                 );
             }

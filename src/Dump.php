@@ -13,6 +13,7 @@ final class Dump
     const TYPE_TABLE = 1;
     const TYPE_TRIGGER = 2;
     const TYPE_PROCEDURE = 3;
+    const TYPE_VIEW = 4;
 
     /** @var int */
     private $type;
@@ -39,6 +40,9 @@ final class Dump
                 break;
             case self::TYPE_PROCEDURE:
                 $dumpSubdirectory = '/procedures';
+                break;
+            case self::TYPE_VIEW:
+                $dumpSubdirectory = '/views';
                 break;
             default:
                 $dumpSubdirectory = '';
