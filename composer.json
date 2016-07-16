@@ -2,6 +2,12 @@
   "name": "filsedla/dbtool",
   "type": "library",
   "license": "MIT",
+  "authors": [
+    {
+      "name": "Filip Sedláček",
+      "email": "filsedla@gmail.com"
+    }
+  ],
   "require": {
     "php": ">= 5.4.0",
     "nette/database": "^2.3",
@@ -9,10 +15,9 @@
     "nette/robot-loader": "^2.3",
     "tracy/tracy": "^2.3"
   },
-  "authors": [
-    {
-      "name": "Filip Sedláček",
-      "email": "filsedla@gmail.com"
-    }
-  ]
+  "autoload": {
+    "classmap": [
+      "src/"
+    ]
+  }
 }
