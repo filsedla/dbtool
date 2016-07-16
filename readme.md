@@ -1,5 +1,5 @@
 # Dbtool
-A MySQL database structure dumping tool. It dumps table structure, views, triggers, functions and procedures.
+A MySQL database structure dumping tool. It dumps tables structure, views, triggers, functions and procedures.
 
 ## Installation
 1) Add Dbtool to your project using [Composer](http://getcomposer.org/):
@@ -7,8 +7,8 @@ A MySQL database structure dumping tool. It dumps table structure, views, trigge
 $ composer require filsedla/dbtool
 ```
 
-2) Create a script located somewhere inside your project, e.g. `<project_root>/tools/db` with the following content 
-(see the [example](example/) subdirectory).
+2) Create a script located somewhere inside your project, e.g. `<project_root>/tools/db/` with the following content 
+(see the [example](example/) subdirectory for a commented version).
 
 ```
 $container = require __DIR__ . '/../../app/bootstrap.php';
