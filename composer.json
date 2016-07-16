@@ -1,10 +1,11 @@
 {
   "name": "filsedla/dbtool",
+  "description": "A MySQL database structure dumping tool",
   "type": "library",
   "license": "MIT",
   "authors": [
     {
-      "name": "Filip Sedláček",
+      "name": "Filip Sedlacek",
       "email": "filsedla@gmail.com"
     }
   ],
