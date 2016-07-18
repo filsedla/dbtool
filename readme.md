@@ -7,7 +7,7 @@ A database structure dumping tool. It dumps tables structure, views, triggers, f
 $ composer require filsedla/dbtool
 ```
 
-2) Create a script to run dbtool located somewhere inside your project, e.g. `<project_root>/tools/db/`.
+2) Create a script to run dbtool located somewhere inside your project, e.g. `<project_root>/tools/db/dbtool.php`.
  
 See the [example](example/) subdirectory for two commented versions, for a [nette-based](https://nette.org/) project or other project.
 
