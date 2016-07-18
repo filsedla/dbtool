@@ -31,6 +31,21 @@ final class DbTool
         $this->fetchDatabaseName();
     }
 
+    /**
+     * @param string $dsn
+     * @param string $user
+     * @param string $password
+     * @param string $dumpDir
+     * @return self
+     */
+    public static function createFromScratch($dsn, $user, $password, $dumpDir)
+    {
+        $connection = new \Nette\Database\Connection($dsn, $user, $password);
+        $structure = new \Nette\Database\Structure($connection, new \Nette\Caching\Storages\DevNullStorage());
+        $context = new \Nette\Database\Context($connection, $structure);
+        return new self($context, $dumpDir);
+    }
+
     private function fetchDatabaseName()
     {
         $row = $this->db->query('SELECT DATABASE()')->fetch();
