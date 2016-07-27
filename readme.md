@@ -4,7 +4,7 @@ A database structure dumping tool. It dumps tables structure, views, triggers, f
 ## Installation
 1) Add Dbtool to your project using [Composer](http://getcomposer.org/):
 ```
-$ composer require filsedla/dbtool
+$ composer require --dev filsedla/dbtool
 ```
 
 2) Create a script to run dbtool located somewhere inside your project, e.g. `<project_root>/tools/db/dbtool.php`.
