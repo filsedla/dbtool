@@ -6,8 +6,6 @@
 
 namespace Filsedla\DbTool;
 
-use Nette\Utils\Callback;
-
 final class Dump
 {
     const TYPE_TABLE = 1;
@@ -104,7 +102,7 @@ final class Dump
         // The file exists
         if ($this->exists()) {
             $fromFile = $this->load();
-            $same = Callback::invoke($compareCallback, $fromFile);
+            $same = $compareCallback($fromFile);
 
             // And the create statement is the same
             if ($same) {
