@@ -195,7 +195,13 @@ final class DbTool
                 $createTable = $row["Create Table"];
 
                 // Remove Auto increment value
-                $createTable = Strings::replace($createTable, '/AUTO_INCREMENT\s*=\s*\d+\s?/');
+                $createTable = Strings::replace($createTable, '/\s+AUTO_INCREMENT\s*=\s*\d+/');
+
+                // Ignore ROW_FORMAT=
+                $createTable = Strings::replace($createTable, '/\s+ROW_FORMAT\s*=\s*(REDUNDANT|COMPACT|DYNAMIC|COMPRESSED)/');
+
+                // Ignore KEY_BLOCK_SIZE=
+                $createTable = Strings::replace($createTable, '/\s+KEY_BLOCK_SIZE\s*=\s*\d+/');
 
                 // Add ;
                 $createTable .= ";";
